@@ -1,8 +1,8 @@
 use axum::{
-    Router, Json,
-    routing::{get, post},
+    http::StatusCode,
     response::{Html, IntoResponse},
-    http::StatusCode
+    routing::{get, post},
+    Json, Router,
 };
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
@@ -15,7 +15,7 @@ async fn main() {
     axum::serve(listener, app()).await.unwrap();
 }
 
-/* 
+/*
 equivalent to declaring in main():
 let app = Router::new().route("/", get(hello));
 */
@@ -25,10 +25,10 @@ fn app() -> Router {
         .route("/post_json", post(print_req))
 }
 
-/* 
+/*
 basic handler that responds with static HTML
 curl -X GET http://localhost:3000/hello
-*/ 
+*/
 async fn hello() -> Html<&'static str> {
     Html("<h1>Hello, World!</h1>")
 }
@@ -36,9 +36,7 @@ async fn hello() -> Html<&'static str> {
 /*
 curl -X POST -H "Content-Type: application/json" -d '{"some_string":"loremipsum"}' http://localhost:3000/post_json
 */
-async fn print_req(
-    Json(payload): Json<ReqBody>,
-) -> impl IntoResponse {
+async fn print_req(Json(payload): Json<ReqBody>) -> impl IntoResponse {
     let res_body = ResBody {
         id: 1337,
         some_string: payload.some_string,
