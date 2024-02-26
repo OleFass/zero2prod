@@ -2,7 +2,13 @@
 name = "zero2prod"
 version = "0.1.0"
 edition = "2021"
+authors = ["Ole Fass <sgt3pr@gmail.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+axum = "0.7.4"
+sqlx = { version = "0.7.3", features = [ "runtime-tokio", "tls-rustls" ] }
+tokio = {version = "1.36.0", features = ["full"]}
+serde = {version = "1.0.197", features = ["derive"]}
+chrono = "0.4.34"
