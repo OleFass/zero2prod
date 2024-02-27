@@ -1,26 +1,25 @@
 use axum::{
-    routing::get,
-    Router,
+    http::StatusCode, 
     response::{
-        //Json,
+        Json,
         IntoResponse,
         Response
-    },
+    }, 
+    routing::get, 
+    Router
 };
 use std::net::SocketAddr;
-//use std::net::TcpListener;
-use chrono::Utc; // For handling datetime
-//use serde_json::json; // For creating JSON objects
+use chrono::Utc;
+use serde::Serialize;
 
 #[tokio::main]
 async fn main() {
-    // build our application with a single route
-    //let app = Router::new().route("/", get(|| async { "Hello, World!" }));
     let app = Router::new()
-        .route("/ping", get(ping_handler));
+        .route("/ping", get(ping_handler))
+        .route("/return_json", get(return_json))
+        .route("/health_check", get(health_check));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));    
     println!("Server listening on {}", addr);
 
     // run our app with hyper, listening globally on port 3000
@@ -28,14 +27,24 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-// Handler for the `/ping` route, now returning JSON
-/*
-async fn ping_handler() -> Json<serde_json::Value> {
-    let current_datetime = Utc::now().to_rfc3339();
-    Json(json!({"current_datetime": current_datetime}))
-}
- */
+/* */
 async fn ping_handler() -> Response {
-    //let current_datetime = Utc::now().to_rfc3339();
-    format!("Current datetime: {}", Utc::now().to_rfc3339()).into_response()
+    let current_datetime = Utc::now().to_rfc3339();
+    format!("Current datetime: {}", current_datetime).into_response()
+}
+
+/* */
+async fn health_check() -> StatusCode {
+    StatusCode::OK
+}
+
+#[derive(Serialize)]
+struct Time {
+    current_datetime: String,
+}
+async fn return_json() -> Response {
+    let time = Time {
+        current_datetime: Utc::now().to_rfc3339()
+    };
+    Json(time).into_response()
 }
